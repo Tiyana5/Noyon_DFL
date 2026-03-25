@@ -1,0 +1,771 @@
+---
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MAS Noyon — Report Management System</title>
+<style>
+/* ── Reset & Base ── */
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#F0F3F8;color:#1A2B4A;font-size:14px;line-height:1.5}
+input,select,button,textarea{font-family:inherit}
+
+/* ── Brand tokens ── */
+:root{
+  --navy:#0D1B40;
+  --blue:#1B4F8A;
+  --teal:#0A7E8C;
+  --teal-lt:#E1F5EE;
+  --teal-dk:#085041;
+  --sky:#3A9EBD;
+  --white:#FFFFFF;
+  --surface:#F4F7FB;
+  --surface2:#EAF0FA;
+  --border:#D4DDE8;
+  --border2:#BCC9D8;
+  --text:#1A2B4A;
+  --text2:#4A5E78;
+  --text3:#7A8FA8;
+  --pill-green-bg:#E4F4E8;--pill-green:#1B6B2F;
+  --pill-amber-bg:#FEF3E2;--pill-amber:#7A4D0A;
+  --pill-red-bg:#FEECEC;--pill-red:#8B2020;
+  --pill-blue-bg:#E6F1FB;--pill-blue:#0C447C;
+  --pill-gray-bg:#F0F3F8;--pill-gray:#4A5E78;
+  --radius:8px;--radius-lg:12px;--radius-xl:16px;
+  --shadow:0 1px 4px rgba(13,27,64,0.10),0 0 0 0.5px rgba(13,27,64,0.07);
+  --shadow-md:0 4px 16px rgba(13,27,64,0.12),0 0 0 0.5px rgba(13,27,64,0.07);
+}
+
+/* ── App shell ── */
+.app-shell{min-height:100vh;display:flex;flex-direction:column}
+
+/* ── Top navbar ── */
+.navbar{background:var(--navy);height:54px;display:flex;align-items:center;padding:0 24px;gap:0;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.25)}
+.nb-brand{display:flex;align-items:center;gap:12px;margin-right:40px;text-decoration:none}
+.nb-diamond{width:26px;height:26px;background:var(--teal);transform:rotate(45deg);border-radius:4px;flex-shrink:0}
+.nb-wordmark{display:flex;flex-direction:column;line-height:1.2}
+.nb-wordmark .top{color:#fff;font-size:13px;font-weight:600;letter-spacing:0.2px}
+.nb-wordmark .sub{color:#7BA8D4;font-size:10px;letter-spacing:0.5px}
+.nb-divider{width:1px;height:28px;background:rgba(255,255,255,0.12);margin-right:4px}
+.nb-link{display:flex;align-items:center;gap:6px;padding:0 14px;height:54px;color:#7BA8D4;font-size:13px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;text-decoration:none;border:none;background:transparent}
+.nb-link:hover{color:#fff;background:rgba(255,255,255,0.05)}
+.nb-link.active{color:#fff;border-bottom:2px solid var(--teal)}
+.nb-link svg{width:15px;height:15px;flex-shrink:0}
+.nb-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.nb-user{display:flex;align-items:center;gap:8px;cursor:pointer;padding:4px 10px;border-radius:var(--radius);transition:background .15s}
+.nb-user:hover{background:rgba(255,255,255,0.08)}
+.nb-avatar{width:30px;height:30px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff}
+.nb-user-info .uname{color:#fff;font-size:12px;font-weight:500}
+.nb-user-info .urole{color:#7BA8D4;font-size:10px}
+
+/* ── Page content ── */
+.page{display:none;padding:24px;max-width:1400px;width:100%;margin:0 auto}
+.page.active{display:block}
+
+/* ── Page header ── */
+.page-header{margin-bottom:20px}
+.page-header h1{font-size:22px;font-weight:600;color:var(--navy);margin-bottom:4px}
+.page-header p{font-size:13px;color:var(--text2)}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3);margin-bottom:8px}
+.breadcrumb span{color:var(--text2)}
+
+/* ── Card ── */
+.card{background:var(--white);border:0.5px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow)}
+
+/* ── Toolbar card ── */
+.toolbar-card{background:var(--white);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:16px;box-shadow:var(--shadow)}
+.toolbar-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.f-label{font-size:11px;font-weight:500;color:var(--text2);white-space:nowrap}
+.f-select{padding:7px 10px;border:0.5px solid var(--border2);border-radius:var(--radius);font-size:12.5px;color:var(--text);background:var(--surface);cursor:pointer;min-width:130px;outline:none;transition:border-color .15s}
+.f-select:hover,.f-select:focus{border-color:var(--blue)}
+.f-date{padding:7px 10px;border:0.5px solid var(--border2);border-radius:var(--radius);font-size:12.5px;color:var(--text);background:var(--surface);width:136px;outline:none}
+.f-date:hover,.f-date:focus{border-color:var(--blue)}
+.f-sep{width:0.5px;height:26px;background:var(--border);margin:0 2px}
+.btn-primary{padding:9px 22px;background:var(--navy);color:#fff;border:none;border-radius:var(--radius);font-size:13px;font-weight:500;cursor:pointer;transition:background .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.btn-primary:hover{background:var(--blue)}
+.btn-outline{padding:8px 16px;background:transparent;color:var(--text2);border:0.5px solid var(--border2);border-radius:var(--radius);font-size:12.5px;font-weight:500;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-outline:hover{border-color:var(--blue);color:var(--navy)}
+.btn-teal{padding:9px 22px;background:var(--teal);color:#fff;border:none;border-radius:var(--radius);font-size:13px;font-weight:500;cursor:pointer;transition:background .15s;white-space:nowrap}
+.btn-teal:hover{background:var(--teal-dk)}
+.toolbar-meta{margin-top:12px;padding-top:12px;border-top:0.5px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.week-chip{background:var(--pill-blue-bg);color:var(--pill-blue);font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;letter-spacing:0.3px}
+.meta-text{font-size:11px;color:var(--text3)}
+
+/* ── Stats row ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.stat-card{background:var(--white);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:14px 18px;box-shadow:var(--shadow);display:flex;align-items:center;gap:14px}
+.stat-icon{width:38px;height:38px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.stat-icon svg{width:18px;height:18px}
+.stat-label{font-size:11px;color:var(--text2);margin-bottom:3px}
+.stat-value{font-size:22px;font-weight:600;color:var(--navy);line-height:1}
+.stat-value.green{color:var(--pill-green)}
+.stat-value.amber{color:var(--pill-amber)}
+.stat-value.red{color:var(--pill-red)}
+
+/* ── Table ── */
+.tbl-card{background:var(--white);border:0.5px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+.tbl-head{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid var(--border)}
+.tbl-head-left{display:flex;align-items:center;gap:10px}
+.tbl-head-left h3{font-size:14px;font-weight:600;color:var(--navy)}
+.tbl-count{background:var(--surface2);color:var(--text2);font-size:11px;font-weight:500;padding:2px 9px;border-radius:20px}
+.scroll-x{overflow-x:auto}
+table.rt{width:100%;border-collapse:collapse;white-space:nowrap}
+table.rt thead th{padding:9px 12px;background:var(--surface);color:var(--text2);font-size:11px;font-weight:600;text-align:left;border-bottom:0.5px solid var(--border);letter-spacing:0.3px;text-transform:uppercase}
+table.rt tbody td{padding:10px 12px;border-bottom:0.5px solid var(--border);font-size:12.5px;color:var(--text);vertical-align:middle}
+table.rt tbody tr:last-child td{border-bottom:none}
+table.rt tbody tr:hover td{background:var(--surface)}
+.pill{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500}
+.pill-green{background:var(--pill-green-bg);color:var(--pill-green)}
+.pill-amber{background:var(--pill-amber-bg);color:var(--pill-amber)}
+.pill-red{background:var(--pill-red-bg);color:var(--pill-red)}
+.pill-blue{background:var(--pill-blue-bg);color:var(--pill-blue)}
+.pill-gray{background:var(--pill-gray-bg);color:var(--pill-gray)}
+.tbi-tag{background:#FEF3E2;color:#7A4D0A;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;font-style:italic}
+.num-due{font-weight:600;color:var(--pill-red)}
+.num-ok{color:var(--pill-green);font-weight:600}
+
+/* ── Critical Path ── */
+.cp-card{background:var(--white);border:0.5px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+.cp-head{padding:14px 18px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.cp-head-left h3{font-size:14px;font-weight:600;color:var(--navy)}
+.cp-head-left p{font-size:11px;color:var(--text3);margin-top:2px}
+.cp-order-chip{background:var(--surface2);color:var(--text2);font-size:11px;padding:4px 12px;border-radius:20px;font-family:monospace}
+.cp-scroll{overflow-x:auto}
+.cp-grid{display:grid;grid-template-columns:repeat(9,1fr);min-width:900px}
+.cp-stage{border-right:0.5px solid var(--border)}
+.cp-stage:last-child{border-right:none}
+.cp-stage-name{padding:9px 8px;background:var(--navy);color:#fff;font-size:10.5px;font-weight:600;text-align:center;letter-spacing:0.3px;border-bottom:0.5px solid rgba(255,255,255,0.1)}
+.cp-row-label{display:grid;grid-template-columns:repeat(9,1fr);min-width:900px;background:var(--surface)}
+.cp-row-label > div{padding:5px 8px;font-size:9.5px;font-weight:600;color:var(--text3);text-align:center;text-transform:uppercase;letter-spacing:0.4px;border-right:0.5px solid var(--border)}
+.cp-row-label > div:last-child{border-right:none}
+.cp-cell-group{padding:0}
+.cp-cell{padding:7px 8px;border-bottom:0.5px solid var(--border);text-align:center;font-size:11px}
+.cp-cell:last-child{border-bottom:none}
+.cp-cell.plnd{color:var(--pill-blue);font-weight:500}
+.cp-cell.replan{color:var(--pill-amber);font-weight:500}
+.cp-cell.act{color:var(--pill-green);font-weight:500}
+.cp-cell.comment{background:var(--surface)}
+.cp-cell input{width:100%;border:0.5px solid var(--border2);border-radius:4px;padding:4px 6px;font-size:10px;background:var(--white);color:var(--text);text-align:center;outline:none;font-family:inherit}
+.cp-cell input:focus{border-color:var(--teal);box-shadow:0 0 0 2px rgba(10,126,140,0.12)}
+.cp-footer{padding:12px 18px;display:flex;align-items:center;justify-content:space-between;border-top:0.5px solid var(--border);background:var(--surface)}
+.cp-legend{display:flex;align-items:center;gap:16px;font-size:11px;color:var(--text3)}
+.legend-dot{width:8px;height:8px;border-radius:2px;display:inline-block;margin-right:4px}
+
+/* ── User Management ── */
+.um-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.search-box{position:relative;flex:1;min-width:220px;max-width:320px}
+.search-box svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--text3);pointer-events:none}
+.search-box input{width:100%;padding:9px 12px 9px 34px;border:0.5px solid var(--border2);border-radius:var(--radius);font-size:13px;background:var(--white);color:var(--text);outline:none;transition:border-color .15s}
+.search-box input::placeholder{color:var(--text3)}
+.search-box input:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(27,79,138,0.10)}
+table.ut{width:100%;border-collapse:collapse}
+table.ut thead th{padding:10px 16px;background:var(--surface);color:var(--text2);font-size:11px;font-weight:600;text-align:left;border-bottom:0.5px solid var(--border);text-transform:uppercase;letter-spacing:0.3px}
+table.ut tbody td{padding:13px 16px;border-bottom:0.5px solid var(--border);font-size:13px;color:var(--text)}
+table.ut tbody tr:last-child td{border-bottom:none}
+table.ut tbody tr:hover td{background:var(--surface)}
+.user-cell{display:flex;align-items:center;gap:12px}
+.avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+.av-teal{background:var(--teal-lt);color:var(--teal-dk)}
+.av-blue{background:var(--pill-blue-bg);color:var(--pill-blue)}
+.av-navy{background:var(--surface2);color:var(--navy)}
+.av-amber{background:var(--pill-amber-bg);color:var(--pill-amber)}
+.user-name{font-size:13px;font-weight:500;color:var(--navy)}
+.user-email{font-size:11px;color:var(--text3);margin-top:1px}
+.role-pill{display:inline-block;padding:3px 11px;border-radius:20px;font-size:11px;font-weight:500}
+.role-admin{background:#EDE9FE;color:#3C3489}
+.role-planner{background:var(--pill-blue-bg);color:var(--pill-blue)}
+.role-viewer{background:var(--pill-gray-bg);color:var(--pill-gray)}
+.dept-chip{display:inline-block;padding:3px 11px;border-radius:20px;font-size:11px;background:var(--surface2);color:var(--text2)}
+.status-badge{display:inline-flex;align-items:center;gap:5px;font-size:12px}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dot-green{background:#3B6D11}
+.dot-red{background:#A32D2D}
+.dot-gray{background:#888780}
+.action-group{display:flex;gap:5px}
+.icon-btn{width:30px;height:30px;border-radius:var(--radius);border:0.5px solid var(--border2);background:transparent;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);transition:all .15s}
+.icon-btn:hover{background:var(--surface2);color:var(--navy);border-color:var(--border)}
+.icon-btn svg{width:14px;height:14px}
+.tbl-footer{padding:12px 18px;border-top:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface)}
+.tbl-footer span{font-size:12px;color:var(--text2)}
+.pagination{display:flex;gap:4px}
+.pg-btn{width:30px;height:30px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--white);font-size:12px;cursor:pointer;color:var(--text2);font-weight:500;transition:all .15s}
+.pg-btn:hover{border-color:var(--blue);color:var(--navy)}
+.pg-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+/* ── Modal ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(10,20,48,0.45);z-index:500;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--white);border-radius:var(--radius-xl);padding:28px 32px;width:420px;max-width:92vw;box-shadow:var(--shadow-md)}
+.modal-title{font-size:17px;font-weight:600;color:var(--navy);margin-bottom:6px}
+.modal-sub{font-size:13px;color:var(--text2);margin-bottom:22px}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:11.5px;font-weight:600;color:var(--text2);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.3px}
+.field input,.field select{width:100%;padding:9px 12px;border:0.5px solid var(--border2);border-radius:var(--radius);font-size:13px;color:var(--text);background:var(--surface);outline:none;transition:border-color .15s}
+.field input::placeholder{color:var(--text3)}
+.field input:focus,.field select:focus{border-color:var(--teal);box-shadow:0 0 0 2px rgba(10,126,140,0.12);background:var(--white)}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:24px}
+
+/* ── Login Page ── */
+.login-page{min-height:100vh;background:var(--navy);display:flex;align-items:stretch}
+.login-left{flex:1;display:flex;flex-direction:column;justify-content:center;padding:60px;background:var(--navy);position:relative;overflow:hidden}
+.login-left::before{content:'';position:absolute;top:-80px;right:-80px;width:360px;height:360px;border-radius:50%;background:rgba(10,126,140,0.12);pointer-events:none}
+.login-left::after{content:'';position:absolute;bottom:-60px;left:-60px;width:260px;height:260px;border-radius:50%;background:rgba(27,79,138,0.15);pointer-events:none}
+.login-brand{display:flex;align-items:center;gap:14px;margin-bottom:60px}
+.login-diamond{width:38px;height:38px;background:var(--teal);transform:rotate(45deg);border-radius:5px}
+.login-brand-text .top{color:#fff;font-size:17px;font-weight:700;letter-spacing:0.2px}
+.login-brand-text .sub{color:#7BA8D4;font-size:11px;letter-spacing:0.8px;margin-top:2px}
+.login-features{display:flex;flex-direction:column;gap:14px;margin-top:auto}
+.lf-item{display:flex;align-items:center;gap:12px}
+.lf-dot{width:8px;height:8px;border-radius:50%;background:var(--teal);flex-shrink:0}
+.lf-item span{color:#9EC4E8;font-size:13px}
+.login-right{width:460px;background:var(--white);display:flex;align-items:center;justify-content:center;padding:48px 40px}
+.login-form-wrap{width:100%;max-width:360px}
+.login-form-wrap .welcome{font-size:24px;font-weight:700;color:var(--navy);margin-bottom:6px}
+.login-form-wrap .sub-welcome{font-size:13px;color:var(--text2);margin-bottom:32px;line-height:1.6}
+.lf-group{margin-bottom:16px}
+.lf-group label{display:block;font-size:11.5px;font-weight:600;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.3px}
+.lf-group input{width:100%;padding:11px 14px;border:0.5px solid var(--border2);border-radius:var(--radius);font-size:14px;color:var(--text);background:var(--surface);outline:none;transition:all .15s}
+.lf-group input::placeholder{color:var(--text3)}
+.lf-group input:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(10,126,140,0.12);background:#fff}
+.btn-login{width:100%;padding:12px;background:var(--navy);color:#fff;border:none;border-radius:var(--radius);font-size:14px;font-weight:600;cursor:pointer;margin-bottom:14px;transition:background .15s;letter-spacing:0.2px}
+.btn-login:hover{background:var(--blue)}
+.login-divider{display:flex;align-items:center;gap:12px;margin:4px 0 14px}
+.login-divider::before,.login-divider::after{content:'';flex:1;height:0.5px;background:var(--border)}
+.login-divider span{font-size:11px;color:var(--text3);white-space:nowrap}
+.btn-sso{width:100%;padding:11px;background:var(--surface);color:var(--navy);border:0.5px solid var(--border2);border-radius:var(--radius);font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s}
+.btn-sso:hover{border-color:var(--teal);background:#fff}
+.btn-sso svg{width:18px;height:18px}
+.sso-badge{display:inline-flex;align-items:center;gap:5px;background:var(--teal-lt);color:var(--teal-dk);font-size:11px;font-weight:500;padding:4px 12px;border-radius:20px;margin-top:16px;width:100%;justify-content:center}
+.login-footer{margin-top:24px;font-size:11px;color:var(--text3);text-align:center;line-height:1.6}
+.mas-badge{display:inline-flex;align-items:center;gap:6px;border-top:0.5px solid var(--border);margin-top:16px;padding-top:16px;width:100%;justify-content:center;color:var(--text3);font-size:11px}
+.mas-badge strong{color:var(--text2)}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#9aacbf}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════
+     SCREEN 1 — SSO LOGIN
+═════════════════════════════════════════════ -->
+<div id="pg-login" class="login-page">
+  <div class="login-left">
+    <div class="login-brand">
+      <div class="login-diamond"></div>
+      <div class="login-brand-text">
+        <div class="top">MAS Noyon</div>
+        <div class="sub">REPORT MANAGEMENT SYSTEM</div>
+      </div>
+    </div>
+    <div class="login-features">
+      <div class="lf-item"><div class="lf-dot"></div><span>Powered by Acentura Inc.</span></div>
+    </div>
+  </div>
+
+  <div class="login-right">
+    <div class="login-form-wrap">
+      <div class="welcome">Welcome back</div>
+      <div class="sub-welcome">Sign in to the MAS Noyon Report Tool with your company credentials.</div>
+
+      <div class="lf-group">
+        <label>Email address</label>
+        <input type="email" id="login-email" placeholder="name@masnoyon.com" autocomplete="email"/>
+      </div>
+      <div class="lf-group">
+        <label>Password</label>
+        <input type="password" id="login-pw" placeholder="Enter your password"/>
+      </div>
+      <button class="btn-login" onclick="doLogin()">Sign in</button>
+
+      <div class="login-divider"><span>or continue with</span></div>
+      <button class="btn-sso" onclick="doSSO()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        Single Sign-On (SSO)
+      </button>
+      <div class="sso-badge">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Secured &nbsp;·&nbsp; Company SSO — no password needed
+      </div>
+
+      <div class="mas-badge">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        <span>Powered by <strong>Acentura Inc.</strong> &nbsp;·&nbsp; www.acentura.com</span>
+      </div>
+      <div class="login-footer">By signing in you agree to MAS Holdings usage policy &amp; data governance terms</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     MAIN APP SHELL (Reports + Users)
+═════════════════════════════════════════════ -->
+<div id="pg-app" class="app-shell" style="display:none">
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a class="nb-brand" href="#" onclick="return false">
+      <div class="nb-diamond"></div>
+      <div class="nb-wordmark">
+        <span class="top">MAS Noyon</span>
+        <span class="sub">REPORT MANAGEMENT SYSTEM</span>
+      </div>
+    </a>
+    <div class="nb-divider"></div>
+    <button class="nb-link active" id="nav-reports" onclick="showPage('reports')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Reports
+    </button>
+    <button class="nb-link" id="nav-users" onclick="showPage('users')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      User Management
+    </button>
+    <div class="nb-right">
+      <div class="nb-user">
+        <div class="nb-avatar">TR</div>
+        <div class="nb-user-info">
+          <div class="uname">Tiyana Rodrigo</div>
+          <div class="urole">Planner · Planning</div>
+        </div>
+      </div>
+      <button onclick="doLogout()" style="padding:6px 14px;background:rgba(255,255,255,0.07);color:#7BA8D4;border:0.5px solid rgba(255,255,255,0.12);border-radius:var(--radius);font-size:12px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,0.13)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'">Sign out</button>
+    </div>
+  </nav>
+
+  <!-- ══ PAGE: REPORTS ══ -->
+  <div id="page-reports" class="page active">
+    <div class="page-header">
+      <div class="breadcrumb">Reports <span>›</span> Delivery Follow-Up</div>
+      <h1>Delivery Follow-Up Report</h1>
+      <p>Generate and track delivery commitments by week, customer, and material — powered by SAP data.</p>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar-card">
+      <div class="toolbar-row">
+        <span class="f-label">Report type</span>
+        <select class="f-select"><option>Delivery Follow-Up (Normal)</option><option>Delivery Follow-Up (Intrix)</option></select>
+        <div class="f-sep"></div>
+        <span class="f-label">From</span>
+        <input class="f-date" type="date" value="2025-09-01"/>
+        <span class="f-label">To</span>
+        <input class="f-date" type="date" value="2025-10-31"/>
+        <div class="f-sep"></div>
+        <span class="f-label">Customer</span>
+        <select class="f-select"><option>ZALANDO VS</option><option>All customers</option><option>UNIBIY VS</option></select>
+        <span class="f-label">Cust Ref</span>
+        <select class="f-select"><option>3011953</option><option>All refs</option></select>
+        <span class="f-label">Material</span>
+        <select class="f-select"><option>DY 1236789</option><option>All materials</option></select>
+        <button class="btn-primary" style="margin-left:auto" onclick="flashGen(this)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          Generate report
+        </button>
+      </div>
+      <div class="toolbar-meta">
+        <span class="week-chip">Week No. 201850</span>
+        <span class="meta-text">Last generated: 22 Sep 2025, 10:14 AM</span>
+        <span class="meta-text">·</span>
+        <span class="meta-text">Showing 3 schedule lines</span>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#EAF3DE">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#3B6D11" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        </div>
+        <div><div class="stat-label">Schedule lines</div><div class="stat-value">3</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#E1F5EE">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#0F6E56" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div><div class="stat-label">Avg. ready %</div><div class="stat-value green">63%</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#FEF3E2">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#854F0B" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        </div>
+        <div><div class="stat-label">Total qty due</div><div class="stat-value amber">1,800 m</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#FEECEC">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#8B2020" stroke-width="1.8"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div><div class="stat-label">Lines at risk</div><div class="stat-value red">1</div></div>
+      </div>
+    </div>
+
+    <!-- Main data table -->
+    <div class="tbl-card">
+      <div class="tbl-head">
+        <div class="tbl-head-left">
+          <h3>Normal orders — ZALANDO VS</h3>
+          <span class="tbl-count">3 lines</span>
+        </div>
+        <button class="btn-outline">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download report
+        </button>
+      </div>
+      <div class="scroll-x">
+        <table class="rt">
+          <thead>
+            <tr>
+              <th>SL Date</th>
+              <th>Sales Doc</th>
+              <th>Cust Ref</th>
+              <th>Material</th>
+              <th>Sched Qty</th>
+              <th>Qty Delivered</th>
+              <th>Delivered %</th>
+              <th>Qty Packed</th>
+              <th>Qty Unpack</th>
+              <th>Ready %</th>
+              <th>Qty Due</th>
+              <th>Prodn. Order</th>
+              <th>Qty (m)</th>
+              <th>Assigned Qty (m)</th>
+              <th>Loc 60</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>10/12/2025</td>
+              <td style="font-family:monospace;font-size:12px">3011953</td>
+              <td style="font-family:monospace;font-size:12px">509829</td>
+              <td style="font-family:monospace;font-size:12px;color:#0C447C;font-weight:500">J5022669BLK</td>
+              <td>1,000</td><td>500</td>
+              <td><span class="pill pill-amber">50%</span></td>
+              <td>200</td><td>300</td>
+              <td><span class="pill pill-green">100%</span></td>
+              <td class="num-ok">0</td>
+              <td style="font-family:monospace;font-size:12px">50089782</td>
+              <td>2,281 m</td><td>1,000 m</td><td>—</td>
+            </tr>
+            <tr>
+              <td>16/12/2025</td>
+              <td style="font-family:monospace;font-size:12px">3011953</td>
+              <td style="font-family:monospace;font-size:12px">509829</td>
+              <td style="font-family:monospace;font-size:12px;color:#0C447C;font-weight:500">J5022669BLK</td>
+              <td>500</td><td>—</td>
+              <td><span class="pill pill-red">0%</span></td>
+              <td>—</td><td>200</td>
+              <td><span class="pill pill-amber">40%</span></td>
+              <td class="num-due">300</td>
+              <td style="font-family:monospace;font-size:12px">50089782</td>
+              <td>2,281 m</td><td>300 m</td><td>—</td>
+            </tr>
+            <tr style="background:#FFFAF5">
+              <td>17/12/2025</td>
+              <td style="font-family:monospace;font-size:12px">3011953</td>
+              <td style="font-family:monospace;font-size:12px">509829</td>
+              <td style="font-family:monospace;font-size:12px;color:#0C447C;font-weight:500">J5022669BLK</td>
+              <td>1,500</td><td>—</td>
+              <td><span class="pill pill-red">0%</span></td>
+              <td>—</td><td>—</td>
+              <td><span class="pill pill-red">0%</span></td>
+              <td class="num-due">1,500</td>
+              <td><span class="tbi-tag">TBI</span></td>
+              <td>1,277 m</td><td>—</td><td>—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Critical Path -->
+    <div class="cp-card">
+      <div class="cp-head">
+        <div class="cp-head-left">
+          <h3>Critical path tracker</h3>
+          <p>Update planned, re-planned, and actual dates per production stage for order 50089782</p>
+        </div>
+        <span class="cp-order-chip">50089782 · J5022669BLK</span>
+      </div>
+      <div class="cp-scroll">
+        <div class="cp-row-label">
+          <div>Batch Issuing</div><div>GR / Warehouse</div><div>Pre-setting</div>
+          <div>Dyeing</div><div>Finishing</div><div>Color</div>
+          <div>QA Lab</div><div>DBI</div><div>Scalloping</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(9,1fr);min-width:900px">
+          <!-- Each stage: PLND, Re-Plan, ACT, Comment -->
+          <div style="border-right:0.5px solid var(--border)">
+            <div class="cp-cell plnd">20/09/25</div>
+            <div class="cp-cell replan">22/09/25</div>
+            <div class="cp-cell act">22/09/25</div>
+            <div class="cp-cell comment"><input value="Delay – RM issuance"/></div>
+          </div>
+          <div style="border-right:0.5px solid var(--border)">
+            <div class="cp-cell plnd">21/09/25</div>
+            <div class="cp-cell replan">23/09/25</div>
+            <div class="cp-cell" style="color:var(--text3)">—</div>
+            <div class="cp-cell comment"><input placeholder="Add comment…"/></div>
+          </div>
+          <div style="border-right:0.5px solid var(--border)">
+            <div class="cp-cell plnd">22/09/25</div>
+            <div class="cp-cell" style="color:var(--text3)">—</div>
+            <div class="cp-cell" style="color:var(--text3)">—</div>
+            <div class="cp-cell comment"><input placeholder="Add comment…"/></div>
+          </div>
+          <div style="border-right:0.5px solid var(--border)">
+            <div class="cp-cell plnd">25/09/25</div>
+            <div class="cp-cell" style="color:var(--text3)">—</div>
+            <div class="cp-cell" style="color:var(--text3)">—</div>
+            <div class="cp-cell comment"><input placeholder="Add comment…"/></div>
+          </div>
+          <div style="border-right:0.5px solid var(--border)">
+            <div class="cp-cell plnd">28/09/25</div>
+            <div class="cp-cell" style="color:var(--text3)">—</div>
+            <div class="cp-cell" style="color:var(--text3)">—</div>
+            <div class="cp-cell comment"><input placeholder="Add comment…"/></div>
+          </div>
+          <div style="border-right:0.5px solid var(--border)">
+            <div class="cp-cell plnd">29/09/25</div>
+            <div class="cp-cell" style="color:var(--text3)">—</div>
+            <div class="cp-cell" style="color:var(--text3)">—</div>
+            <div class="cp-cell comment"><input placeholder="Add comment…"/></div>
+          </div>
+          <div style="border-right:0.5px solid var(--border)">
+            <div class="cp-cell plnd">30/09/25</div>
+            <div class="cp-cell" style="color:var(--text3)">—</div>
+            <div class="cp-cell" style="color:var(--text3)">—</div>
+            <div class="cp-cell comment"><input placeholder="Add comment…"/></div>
+          </div>
+          <div style="border-right:0.5px solid var(--border)">
+            <div class="cp-cell plnd">01/10/25</div>
+            <div class="cp-cell" style="color:var(--text3)">—</div>
+            <div class="cp-cell" style="color:var(--text3)">—</div>
+            <div class="cp-cell comment"><input placeholder="Add comment…"/></div>
+          </div>
+          <div>
+            <div class="cp-cell plnd">03/10/25</div>
+            <div class="cp-cell" style="color:var(--text3)">—</div>
+            <div class="cp-cell" style="color:var(--text3)">—</div>
+            <div class="cp-cell comment"><input placeholder="Add comment…"/></div>
+          </div>
+        </div>
+        <!-- Row legend -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);max-width:444px;border-top:0.5px solid var(--border);background:var(--surface)">
+          <div style="padding:5px 8px;font-size:9px;font-weight:600;color:var(--pill-blue);text-align:center;border-right:0.5px solid var(--border);letter-spacing:0.4px">PLANNED</div>
+          <div style="padding:5px 8px;font-size:9px;font-weight:600;color:var(--pill-amber);text-align:center;border-right:0.5px solid var(--border);letter-spacing:0.4px">RE-PLAN</div>
+          <div style="padding:5px 8px;font-size:9px;font-weight:600;color:var(--pill-green);text-align:center;border-right:0.5px solid var(--border);letter-spacing:0.4px">ACTUAL</div>
+          <div style="padding:5px 8px;font-size:9px;font-weight:600;color:var(--text3);text-align:center;letter-spacing:0.4px">COMMENT</div>
+        </div>
+      </div>
+      <div class="cp-footer">
+        <div class="cp-legend">
+          <span><span class="legend-dot" style="background:var(--pill-blue)"></span>Planned date from SAP</span>
+          <span><span class="legend-dot" style="background:var(--pill-amber)"></span>Re-planned by dept.</span>
+          <span><span class="legend-dot" style="background:var(--pill-green)"></span>Actual completion</span>
+          <span style="color:#A32D2D"><span class="legend-dot" style="background:#A32D2D"></span>TBI — not yet assigned</span>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-outline" style="font-size:12px;padding:7px 14px">Discard</button>
+          <button class="btn-teal" style="font-size:12px;padding:8px 20px" onclick="saveCP(this)">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: USER MANAGEMENT ══ -->
+  <div id="page-users" class="page">
+    <div class="page-header">
+      <div class="breadcrumb">Administration <span>›</span> User Management</div>
+      <h1>User Management</h1>
+      <p>Manage user access, roles, and department assignments for the report platform.</p>
+    </div>
+
+    <div class="um-toolbar">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="Search by name or email…" oninput="filterUsers(this.value)"/>
+      </div>
+      <select class="f-select" onchange="filterUsers()" id="role-filter" style="min-width:120px">
+        <option value="">All roles</option>
+        <option>Admin</option><option>Planner</option><option>Viewer</option>
+      </select>
+      <select class="f-select" style="min-width:140px">
+        <option>All departments</option>
+        <option>Planning</option><option>Dyeing</option><option>QA Lab</option><option>DBI</option><option>Scalloping</option><option>IT</option>
+      </select>
+      <select class="f-select" style="min-width:120px">
+        <option>All status</option><option>Active</option><option>Disabled</option>
+      </select>
+      <button class="btn-primary" style="margin-left:auto" onclick="openModal()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Assign user
+      </button>
+    </div>
+
+    <div class="tbl-card">
+      <table class="ut" id="user-table">
+        <thead>
+          <tr>
+            <th style="width:280px">User</th>
+            <th style="width:110px">Role</th>
+            <th style="width:140px">Department</th>
+            <th style="width:100px">Status</th>
+            <th style="width:130px">Last active</th>
+            <th style="width:110px">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="user-tbody">
+          <tr>
+            <td><div class="user-cell"><div class="avatar av-teal">TR</div><div><div class="user-name">Tiyana Rodrigo</div><div class="user-email">tiyana.rodrigo@acentura.com</div></div></div></td>
+            <td><span class="role-pill role-admin">Admin</span></td>
+            <td><span class="dept-chip">Planning</span></td>
+            <td><div class="status-badge"><div class="dot dot-green"></div>Active</div></td>
+            <td style="font-size:12px;color:var(--text2)">Today, 09:42 AM</td>
+            <td><div class="action-group">
+              <button class="icon-btn" title="Edit user"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="icon-btn" title="Disable user"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></button>
+            </div></td>
+          </tr>
+          <tr>
+            <td><div class="user-cell"><div class="avatar av-blue">SW</div><div><div class="user-name">Sachini Wickramaarachchi</div><div class="user-email">sachini.w@masnoyon.com</div></div></div></td>
+            <td><span class="role-pill role-planner">Planner</span></td>
+            <td><span class="dept-chip">Planning</span></td>
+            <td><div class="status-badge"><div class="dot dot-green"></div>Active</div></td>
+            <td style="font-size:12px;color:var(--text2)">Today, 08:15 AM</td>
+            <td><div class="action-group">
+              <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></button>
+            </div></td>
+          </tr>
+          <tr>
+            <td><div class="user-cell"><div class="avatar av-navy">KK</div><div><div class="user-name">Kirushan Kirupamoorthy</div><div class="user-email">kirushan.k@masnoyon.com</div></div></div></td>
+            <td><span class="role-pill role-planner">Planner</span></td>
+            <td><span class="dept-chip">Dyeing</span></td>
+            <td><div class="status-badge"><div class="dot dot-green"></div>Active</div></td>
+            <td style="font-size:12px;color:var(--text2)">Yesterday, 3:20 PM</td>
+            <td><div class="action-group">
+              <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></button>
+            </div></td>
+          </tr>
+          <tr>
+            <td><div class="user-cell"><div class="avatar av-amber">CP</div><div><div class="user-name">Chaithika Prabudda</div><div class="user-email">chaithika.p@masnoyon.com</div></div></div></td>
+            <td><span class="role-pill role-viewer">Viewer</span></td>
+            <td><span class="dept-chip">QA Lab</span></td>
+            <td><div class="status-badge"><div class="dot dot-red"></div>Disabled</div></td>
+            <td style="font-size:12px;color:var(--text2)">3 days ago</td>
+            <td><div class="action-group">
+              <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="icon-btn" style="color:#3B6D11" title="Re-enable"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="16 12 12 8 8 12"/><line x1="12" y1="16" x2="12" y2="8"/></svg></button>
+            </div></td>
+          </tr>
+          <tr>
+            <td><div class="user-cell"><div class="avatar av-teal">AK</div><div><div class="user-name">Ajith Kodithuwakku</div><div class="user-email">ajith.k@acentura.com</div></div></div></td>
+            <td><span class="role-pill role-admin">Admin</span></td>
+            <td><span class="dept-chip">IT</span></td>
+            <td><div class="status-badge"><div class="dot dot-green"></div>Active</div></td>
+            <td style="font-size:12px;color:var(--text2)">Today, 11:05 AM</td>
+            <td><div class="action-group">
+              <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></button>
+            </div></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="tbl-footer">
+        <span>Showing 5 of 12 users</span>
+        <div class="pagination">
+          <button class="pg-btn active">1</button>
+          <button class="pg-btn">2</button>
+          <button class="pg-btn">3</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Assign User Modal -->
+<div class="modal-bg" id="assign-modal">
+  <div class="modal">
+    <div class="modal-title">Assign user</div>
+    <div class="modal-sub">Enter the user's company email and assign a role and department to grant platform access.</div>
+    <div class="field">
+      <label>Email address</label>
+      <input type="email" placeholder="name@masnoyon.com" id="m-email"/>
+    </div>
+    <div class="field">
+      <label>User role</label>
+      <select id="m-role">
+        <option>Planner</option><option>Admin</option><option>Viewer</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Department</label>
+      <select id="m-dept">
+        <option>Planning</option><option>Dyeing</option><option>Finishing</option>
+        <option>Color</option><option>QA Lab</option><option>DBI</option>
+        <option>Scalloping</option><option>GR / Warehouse</option><option>IT</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn-teal" onclick="assignUser(this)">Assign user</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function doLogin(){
+  const e=document.getElementById('login-email').value.trim();
+  if(!e){document.getElementById('login-email').style.borderColor='#E24B4A';setTimeout(()=>document.getElementById('login-email').style.borderColor='',1600);return;}
+  document.getElementById('pg-login').style.display='none';
+  document.getElementById('pg-app').style.display='flex';
+}
+function doSSO(){
+  document.getElementById('pg-login').style.display='none';
+  document.getElementById('pg-app').style.display='flex';
+}
+function doLogout(){
+  document.getElementById('pg-app').style.display='none';
+  document.getElementById('pg-login').style.display='flex';
+  document.getElementById('login-email').value='';
+  document.getElementById('login-pw').value='';
+}
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nb-link').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.getElementById('nav-'+id).classList.add('active');
+}
+function flashGen(btn){
+  btn.textContent='Generating…';
+  btn.style.background='#0A7E8C';
+  setTimeout(()=>{btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Generate report';btn.style.background='';},1600);
+}
+function saveCP(btn){
+  btn.textContent='Saving…';
+  setTimeout(()=>{btn.textContent='Saved ✓';btn.style.background='#3B6D11';
+    setTimeout(()=>{btn.textContent='Save changes';btn.style.background='';},1800);},800);
+}
+function openModal(){document.getElementById('assign-modal').classList.add('open');}
+function closeModal(){document.getElementById('assign-modal').classList.remove('open');}
+function assignUser(btn){
+  const e=document.getElementById('m-email').value.trim();
+  if(!e){document.getElementById('m-email').style.borderColor='#E24B4A';return;}
+  btn.textContent='Assigning…';
+  setTimeout(()=>{btn.textContent='Assigned ✓';btn.style.background='#3B6D11';
+    setTimeout(()=>{closeModal();btn.textContent='Assign user';btn.style.background='';document.getElementById('m-email').value='';},1200);},700);
+}
+document.getElementById('assign-modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+function filterUsers(val){}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+</script>
+</body>
+</html>
